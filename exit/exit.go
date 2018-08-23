@@ -5,7 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"onion-router/comm"
+	"time"
 )
+
+var client = &http.Client{
+	Timeout: time.Second * 10,
+};
 
 /*
  * Handle() takes a message, makes a request to the
@@ -13,7 +18,7 @@ import (
  * payload.
  */
 func Handle(message comm.ExitMessage) (*comm.ExitMessage, error) {
-	res, err := http.Get(message.Address)
+	res, err := client.Get(message.Address)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to reach exit address")
 	}
