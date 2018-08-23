@@ -1,11 +1,11 @@
 package main
 
 import (
-	"onion-router/server"
 	"fmt"
+	"onion-router/server"
 )
 
 func main() {
-	fmt.Println("Starting decentralised onion router...");
+	fmt.Println("Starting decentralised onion router...")
 	server.Serve()
 }
