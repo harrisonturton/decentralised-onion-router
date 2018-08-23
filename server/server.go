@@ -1,23 +1,14 @@
 package server
 
 import (
+	"onion-router/comm"
+	"onion-router/exit"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
-
-type Message struct {
-	/* Says if we're to operate as an exit node */
-	ExitAddress *string `json:"exit_address"`
-
-	/* If not exit node, then relay. Address of node to forward to */
-	Next        *string `json:"next"`
-
-	/* Payload to transfer */
-	Payload     string `json:"payload"`
-}
 
 func Serve() {
 	fmt.Println("Starting server...")
@@ -39,7 +30,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var message Message
+	var message comm.Message
 	if err := json.Unmarshal(body, &message); err != nil {
 		fmt.Println("Error! Cannot parse request body.")
 		fmt.Println(err.Error())
@@ -48,14 +39,28 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 
 	/* If exit node ... */
 	if message.ExitAddress != nil {
-		w.Write([]byte(*message.ExitAddress + "\n"))
+		exitResp, err := exit.Handle(comm.ExitMessage{
+			Address: *message.ExitAddress,
+			Payload: message.Payload,
+		})
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			fmt.Println(err.Error())
+			return
+		}
+		w.Write([]byte(exitResp.Address + "\n"))
+		w.Write([]byte(exitResp.Payload + "\n"))
 		fmt.Println("Exit node!")
 		return
 	}
 
 	/* If relay node ... */
 	if message.Next != nil {
-		w.Write([]byte(*message.Next + "\n"))
+		relayMessage := comm.RelayMessage{
+			Next: *message.Next,
+			Payload: message.Payload,
+		}
+		w.Write([]byte(relayMessage.Next + "\n"))
 		fmt.Println("Relay node!")
 		return
 	}
