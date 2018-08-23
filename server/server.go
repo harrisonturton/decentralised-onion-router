@@ -64,4 +64,7 @@ func HandleConnection(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("Relay node!")
 		return
 	}
+
+	w.Write([]byte("Unknown message. Are you trying to send a message to a relay node, or an exit node?"))
+	fmt.Println("Unknown message. Are you trying to send a message to a relay node, or an exit node?")
 }
