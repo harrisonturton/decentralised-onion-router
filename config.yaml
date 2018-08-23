@@ -1,2 +1,16 @@
-host: ""
-port: 3333
+# General server parameters
+server:
+  host: ""
+  port: 3333
+  # tls: true
+  # tls_key: server/server.key
+  # tls_crt: server/server.crt
+  
+# Exit node parameters
+exit_node:
+  force_https: true
+  timeout: 50
+
+# Relay node parameters
+relay_node:
+  timeout: 50

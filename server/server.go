@@ -8,22 +8,17 @@ import (
 	"log"
 	"net/http"
 	"onion-router/comm"
+	"onion-router/config"
 	"onion-router/exit"
 )
-
-type Config struct {
-	Host string
-	Port string
-}
 
 /*
  * Serve handles all the requests and routes them
  * through to HandleConnection() on a seperate]
  * goroutine.
  */
-func Serve(config Config) {
+func Serve(config config.ServerConfig) {
 	fmt.Println("Starting server...")
-	fmt.Println("-------------------------------")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", HandleConnection)
 	srv := &http.Server{
