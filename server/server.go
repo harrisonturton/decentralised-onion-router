@@ -11,18 +11,23 @@ import (
 	"onion-router/exit"
 )
 
+type Config struct {
+	Host string
+	Port string
+}
+
 /*
  * Serve handles all the requests and routes them
  * through to HandleConnection() on a seperate]
  * goroutine.
  */
-func Serve() {
+func Serve(config Config) {
 	fmt.Println("Starting server...")
 	fmt.Println("-------------------------------")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", HandleConnection)
 	srv := &http.Server{
-		Addr:    ":3333",
+		Addr: config.Host + ":" + config.Port,
 		Handler: mux,
 	}
 	log.Fatal(srv.ListenAndServe())
