@@ -7,4 +7,7 @@ elif [[ "$1" = "-r" ]]; then
 	curl -X POST -H "Content-Type: application/json" -d @relay_request.json localhost:${2}
 elif [[ "$1" = "-e" ]]; then
 	curl -X POST -H "Content-Type: application/json" -d @exit_request.json localhost:${2}
+elif [[ "$1" = "-k" ]]; then
+	echo "Test key exchange..."
+	curl -X POST -H "Content-Type: application/json" -d @key_request.json localhost:${2}/key | xxd
 fi

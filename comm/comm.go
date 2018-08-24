@@ -17,6 +17,10 @@ type ExitMessage struct {
 }
 
 type RelayMessage struct {
-	Next string
+	Next    string
 	Payload string
+}
+
+type KeyMessage struct {
+	PublicKey []byte `json:"public_key"`
 }

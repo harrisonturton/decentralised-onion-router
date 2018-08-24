@@ -6,7 +6,7 @@ import (
 )
 
 type DHSession struct {
-	Group      dhkx.Group
+	Group      dhkx.DHGroup
 	PrivateKey dhkx.DHKey
 	PublicKey  []byte
 }
@@ -23,17 +23,17 @@ func NewSession() (*DHSession, error) {
 	}
 
 	return &DHSession{
-		Group: group,
-		PrivateKey: priv,
+		Group: *group,
+		PrivateKey: *priv,
 		PublicKey: priv.Bytes(),
-	}
+	}, nil
 }
 
 func ComputeSecret(session DHSession, foreignKey []byte) ([]byte, error) {
 	foreignPublic := dhkx.NewPublicKey(foreignKey)
-	secret, err := session.Group.ComputeKey(foreignPublic, session.PrivateKey)
+	secret, err := session.Group.ComputeKey(foreignPublic, &session.PrivateKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to compute shared secret")
 	}
-	return secret
+	return secret.Bytes(), nil
 }
