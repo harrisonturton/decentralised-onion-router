@@ -15,7 +15,7 @@ func main() {
 
 	wg.Add(2)
 	go cli.Run(done, &wg)
-	go server.Serve(done, &wg)
+	go server.Run(done, &wg)
 	wg.Wait()
 
 	fmt.Println("Goodbye!")
