@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"os"
 	"strings"
+	"sync"
 )
 
 /*
@@ -31,7 +32,8 @@ var commandHandlers = map[string]Handler{
  * channel closes, otherwise read, parse &
  * execute commands from STDIN.
  */
-func Run(done chan bool) {
+func Run(done chan bool, wg *sync.WaitGroup) {
+	defer wg.Done()
 	printWelcome()
 	for {
 		select {

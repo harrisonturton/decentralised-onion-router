@@ -2,15 +2,21 @@ package main
 
 import (
 	"fmt"
-	"partch-onion-router/cli"
-	"partch-onion-router/server"
+	"onion-router/cli"
+	"onion-router/server"
+	"sync"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 	// Used to synchronse stopping
 	done := make(chan bool)
-	go cli.Run(done)
-	go server.Serve(done)
-	<-done
+
+	wg.Add(2)
+	go cli.Run(done, &wg)
+	go server.Run(done, &wg)
+	wg.Wait()
+
 	fmt.Println("Goodbye!")
 }
