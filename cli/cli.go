@@ -9,29 +9,45 @@ import (
 	"sync"
 )
 
-/*
- * Functions that take commandline input, and execute
- * behaviour accordingly.
- */
+type Command int
+
+const (
+	Help Command = iota
+	Exit
+	Relay
+	Man
+	Clear
+	Quit
+	Announce
+)
+
+// Commandline input causes these function handlers
+// to be executed
 type Handler func(argv []string, done chan bool)
 
-/*
- * Mapping of command name to the handler it triggers
- */
-var commandHandlers = map[string]Handler{
-	"help":  helpHandler,
-	"exit":  exitHandler,
-	"relay": relayHandler,
-	"man":   manHandler,
-	"clear": clearHandler,
-	"quit":  quitHandler,
+var commandNames = map[string]Command{
+	"help":     Help,
+	"exit":     Exit,
+	"relay":    Relay,
+	"man":      Man,
+	"clear":    Clear,
+	"quit":     Quit,
+	"announce": Announce,
 }
 
-/*
- * Handle closing goroutine when the done
- * channel closes, otherwise read, parse &
- * execute commands from STDIN.
- */
+// Mapping of a command name to the handler it triggers
+var commandHandlers = map[Command]Handler{
+	Help:  helpHandler,
+	Exit:  exitHandler,
+	Relay: relayHandler,
+	Man:   manHandler,
+	Clear: clearHandler,
+	Quit:  quitHandler,
+}
+
+// Read, parse & execute command from STDIN.
+// Handles safely stopping when the done channel
+// closes.
 func Run(done chan bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 	printWelcome()
@@ -51,24 +67,21 @@ func Run(done chan bool, wg *sync.WaitGroup) {
 	}
 }
 
-/*
- * Parse & execute commandline input.
- */
+// Parse commandline input & route to relavant handler
 func handleInput(input []string, done chan bool) {
 	if len(input) == 0 {
 		return
 	}
 	// Check if command name exists in command handler map
-	if handler, ok := commandHandlers[input[0]]; ok {
+	commandName := commandNames[input[0]]
+	if handler, ok := commandHandlers[commandName]; ok {
 		// Execute handler
 		handler(input, done)
 	}
 }
 
-/*
- * Read a line from STDIN. Removes the newline
- * at the end. Splits the input by the spaces.
- */
+// Read a line from STDIN. Returns the input
+// with leading & trailing whitespace removed.
 func readInput() (*[]string, error) {
 	buf := bufio.NewReader(os.Stdin)
 	fmt.Print(">>> ")
@@ -80,6 +93,8 @@ func readInput() (*[]string, error) {
 	return &inputFields, nil
 }
 
+// Print the initial "blurb" that appears
+// when entering into the CLI.
 func printWelcome() {
 	fmt.Println("Onion Router 0.0.1")
 	fmt.Println("[Dev Branch, Apr 1 2018]")
