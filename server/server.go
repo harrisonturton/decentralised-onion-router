@@ -49,14 +49,8 @@ func attemptShutdown(server *http.Server) error {
 
 // Creates a http.Server with the proper handlers
 func makeServer(port int) *http.Server {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		fmt.Fprint(w, "Hello World")
-	})
-	fmt.Println(strconv.Itoa(port))
 	return &http.Server{
 		Addr:    ":" + strconv.Itoa(port),
-		Handler: mux,
+		Handler: makeMux(),
 	}
 }
